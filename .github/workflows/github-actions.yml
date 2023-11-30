@@ -1,0 +1,24 @@
+name: Build gcc
+
+on: [push]
+    
+jobs:
+  build:
+    runs-on: ubuntu:23.10
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update -y
+          apt-get install -y wget build-essential libz-dev
+      - name: Download tarball
+        run: wget https://ftp.mpi-inf.mpg.de/mirrors/gnu/mirror/gcc.gnu.org/pub/gcc/snapshots/14-20231126/gcc-14-20231126.tar.xz
+      - name: Unpack tarball
+        run: tar --strip-components=1 -xJf gcc-14-20231126.tar.xz
+      - name: Download prerequisites
+        run: ./contrib/download_prerequisites --no-isl
+      - name: Configure
+        run: ./configure --prefix=/opt/gcc-latest --enable-languages=c,c++ --enable-libstdcxx-debug --enable-libstdcxx-backtrace --disable-bootstrap --disable-multilib --disable-libvtv --with-system-zlib --without-isl --enable-multiarch
+      - name: Build
+        run: |
+          make -j$(nproc)
+          make install
