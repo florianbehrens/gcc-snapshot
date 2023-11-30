@@ -1,24 +1,35 @@
-name: Build gcc
+name: Create Docker image with latest gcc snapshot
 
 on: [push]
+
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
     
 jobs:
-  build:
+  build-and-push-image:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y wget build-essential libz-dev
-      - name: Download tarball
-        run: wget https://ftp.mpi-inf.mpg.de/mirrors/gnu/mirror/gcc.gnu.org/pub/gcc/snapshots/14-20231126/gcc-14-20231126.tar.xz
-      - name: Unpack tarball
-        run: tar --strip-components=1 -xJf gcc-14-20231126.tar.xz
-      - name: Download prerequisites
-        run: ./contrib/download_prerequisites --no-isl
-      - name: Configure
-        run: ./configure --prefix=/opt/gcc-latest --enable-languages=c,c++ --enable-libstdcxx-debug --enable-libstdcxx-backtrace --disable-bootstrap --disable-multilib --disable-libvtv --with-system-zlib --without-isl --enable-multiarch
-      - name: Build
-        run: |
-          make -j$(nproc)
-          make install
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Docker Login
+        uses: docker/login-action@v3.0.0
+        with:
+            registry: ${{ env.REGISTRY }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5.0.0
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5.1.0
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
