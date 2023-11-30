@@ -8,8 +8,8 @@ jobs:
     steps:
       - name: Install dependencies
         run: |
-          apt-get update -y
-          apt-get install -y wget build-essential libz-dev
+          sudo apt-get update -y
+          sudo apt-get install -y wget build-essential libz-dev
       - name: Download tarball
         run: wget https://ftp.mpi-inf.mpg.de/mirrors/gnu/mirror/gcc.gnu.org/pub/gcc/snapshots/14-20231126/gcc-14-20231126.tar.xz
       - name: Unpack tarball
