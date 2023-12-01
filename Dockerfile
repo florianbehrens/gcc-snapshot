@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 ENV TARBALL=gcc-14-20231126.tar.xz
-ENV PACKAGES=wget build-essential file flex libz-dev
+ENV PACKAGES="wget build-essential file flex libz-dev"
 WORKDIR /tmp/gcc-build
 
 RUN apt-get update -y && \
