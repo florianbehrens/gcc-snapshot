@@ -14,7 +14,7 @@ RUN apt-get update -y && \
     make -j$(nproc) && \
     make install && \
     apt-get remove -y ${PACKAGES} && \
-    apt autoremove && apt clean && \
+    apt autoremove -y && apt clean -y && \
     cd .. && rm -rf gcc-build
 
 WORKDIR /
