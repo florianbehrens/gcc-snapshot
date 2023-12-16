@@ -1,6 +1,9 @@
 name: Create Docker image with latest gcc snapshot
 
-on: [push]
+on: 
+  push
+  schedule:
+    - cron: '0 0 * * MON'
 
 env:
     REGISTRY: ghcr.io
